@@ -53,8 +53,8 @@ def extract_times_from_pdf(pdf_bytes):
 
     df = pd.DataFrame(extrahiert, columns=["Datum", "Wochentag", "Von1", "Bis1", "Von2", "Bis2"])
 
-    # ❗ Filter: Nur Zeilen mit Datum 01.–31. zulassen
-    df = df[df["Datum"].str.match(r"^(0[1-9]|[12][0-9]|3[01])\.")]
+    # ❗ Nur erste Zeile (vermutlich Vormonat) entfernen
+    df = df.iloc[1:]
 
     def parse_time(text):
         match = re.match(r"(\d{1,2})[:\.]?(\d{2})", str(text))
