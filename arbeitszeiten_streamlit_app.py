@@ -157,7 +157,7 @@ if uploaded_file:
     with st.spinner("Verarbeite PDF..."):
         df_result = extract_times_from_pdf(pdf_bytes)
         st.success("Extraktion abgeschlossen!")
-                df_view = df_result.drop(df_result.columns[6:14], axis=1)
+                df_view = df_result.drop(columns=['Von1_Stunde', 'Von1_Minute', 'Bis1_Stunde', 'Bis1_Minute', 'Von2_Stunde', 'Von2_Minute', 'Bis2_Stunde', 'Bis2_Minute'], errors="ignore")
         st.dataframe(df_view)
 
         excel_bytes = create_formatted_excel(df_result)
