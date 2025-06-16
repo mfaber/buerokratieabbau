@@ -4,9 +4,8 @@ import pandas as pd
 import pdfplumber
 import re
 from io import BytesIO
-from openpyxl import load_workbook
+from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Border, Side
-from openpyxl.utils import get_column_letter
 
 st.set_page_config(page_title="Arbeitszeiten-Extraktion", layout="wide")
 st.title("🕒 Arbeitszeit-Extraktion aus MyTMA-PDF")
@@ -53,7 +52,7 @@ def extract_times_from_pdf(pdf_bytes):
                 extrahiert.append([datum, wochentag, von1, bis1, von2, bis2])
 
     df = pd.DataFrame(extrahiert, columns=["Datum", "Wochentag", "Von1", "Bis1", "Von2", "Bis2"])
-    df = df.iloc[1:]  # erste Zeile entfernen
+    df = df.iloc[1:]
 
     def parse_time(text):
         match = re.match(r"(\d{1,2})[:\.]?(\d{2})", str(text))
@@ -81,19 +80,15 @@ def extract_times_from_pdf(pdf_bytes):
     df = df.astype({col: "Int64" for col in df.columns if col.endswith("_Stunde") or col.endswith("_Minute")})
     return df
 
-def export_formatiert_excel(df):
-    from openpyxl import Workbook
-
+def create_formatted_excel(df):
     wb = Workbook()
     ws = wb.active
     ws.title = "Arbeitszeiten"
 
-    # Farben/Rahmen
     yellow_fill = PatternFill("solid", fgColor="FFFF99")
     blue_border_thin = Side(style="thin", color="0000FF")
     blue_border_thick = Side(style="medium", color="0000FF")
 
-    # Kopfzeile
     ws["A1"] = "Wo."
     ws["B1"] = "tag"
     ws["C1"] = "Tag"
@@ -108,7 +103,6 @@ def export_formatiert_excel(df):
     ws["F2"] = "Std"
     ws["G2"] = "Min"
 
-    # Spaltenbreiten
     for col, width in zip("ABCDEFG", [5, 5, 6, 6, 5, 6, 5]):
         ws.column_dimensions[col].width = width
 
@@ -130,9 +124,9 @@ def export_formatiert_excel(df):
             cell.border = Border(top=blue_border_thin, bottom=blue_border_thin,
                                  left=blue_border_thin, right=blue_border_thin)
             if is_weekend:
-                cell.fill = yellow_fill
+                cell.fill = PatternFill("solid", fgColor="FFFF99")
 
-        for i in [3, 4, 5, 6]:  # CDEF → Beginn/Ende
+        for i in [3, 4, 5, 6]:
             row[i].border = Border(top=blue_border_thick, bottom=blue_border_thick,
                                    left=blue_border_thick, right=blue_border_thick)
 
@@ -147,7 +141,7 @@ if uploaded_file:
         st.success("Extraktion abgeschlossen!")
         st.dataframe(df_result)
 
-        excel_bytes = export_formatiert_excel(df_result)
+        excel_bytes = create_formatted_excel(df_result)
         st.download_button("📥 Excel herunterladen", excel_bytes,
                            file_name="Arbeitszeiten_Export_formatiert.xlsx",
                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
