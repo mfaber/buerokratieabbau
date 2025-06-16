@@ -112,7 +112,7 @@ def create_formatted_excel(df):
     ws["L14"] = "Fragen, Anregungen zum Tool: faberm@rki.de"
 
     ws["A1"] = "Wo."
-    ws["C1"] = "Tag"
+    ws["B1"] = "Tag"
     ws.merge_cells("A1:B1")
     ws.merge_cells("C1:C2")
     ws["D1"] = "Beginn"
@@ -129,7 +129,6 @@ def create_formatted_excel(df):
 
     for i, row in df.iterrows():
         r = i + 2
-        ws.cell(row=r, column=1).value = row["Datum"]
         ws.cell(row=r, column=2).value = row["Datum"]
         ws.cell(row=r, column=3).value = row["Wochentag"]
         ws.cell(row=r, column=4).value = int(row["Von_gesamt_Stunde"]) if pd.notna(row["Von_gesamt_Stunde"]) else None
