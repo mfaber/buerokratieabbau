@@ -52,7 +52,8 @@ def extract_times_from_pdf(pdf_bytes):
                 extrahiert.append([datum, wochentag, von1, bis1, von2, bis2])
 
     df = pd.DataFrame(extrahiert, columns=["Datum", "Wochentag", "Von1", "Bis1", "Von2", "Bis2"])
-    df = df.iloc[1:]
+    if df.iloc[0]["Datum"].startswith(("28.", "29.", "30.", "31.")):
+        df = df.iloc[1:]
 
     def parse_time(text):
         match = re.match(r"(\d{1,2})[:\.]?(\d{2})", str(text))
