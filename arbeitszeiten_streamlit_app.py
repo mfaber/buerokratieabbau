@@ -95,8 +95,9 @@ def create_formatted_excel(df):
     ws = wb.active
     ws["L1"] = "ℹ️ Anleitung zur Nutzung"
 
+    
     from openpyxl.styles import Font
-    for i in range(6, 14 + 1):
+    for i in range(9, 14 + 1):
         ws[f"L{i}"].font = Font(bold=True)
     ws["L2"] = "1. Zeiten aus MyTMA exportieren:"
     ws["L3"] = "- Menüpunkt Auskunft → Selbstauskunft"
