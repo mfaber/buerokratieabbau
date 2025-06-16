@@ -91,12 +91,7 @@ def extract_times_from_pdf(pdf_bytes):
 def create_formatted_excel(df):
     wb = Workbook()
     ws = wb.active
-    ws["L1"] = "ℹ️ Anleitung zur Nutzung:"
-
-    for col, width in zip("ABCDEFG", [5, 5, 6, 6, 5, 6, 5]):
-        ws.column_dimensions[col].width = width
-
-    ws["L2"] = "1. Zeiten aus MyTMA exportieren:"
+    ws["L1"] = "ℹ️ Anleitung zur Nutzung:"ws["L2"] = "1. Zeiten aus MyTMA exportieren:"
     ws["L3"] = "   - Auskunft → Selbstauskunft"
     ws["L4"] = "   - Monat und Jahr wählen, Haken bei 'Bemerkungen' und 'Kalenderwochen' deaktivieren"
     ws["L5"] = "   - Auf 'Drucken' klicken und PDF abspeichern"
@@ -106,9 +101,9 @@ def create_formatted_excel(df):
     ws["L9"] = "5. Minuten in Spalte N manuell ergänzen."
     ws["L10"] = "6. (optional) Verwaltung um geeignete Workflows bitten."
     ws["L11"] = "7. Fragen, Anregungen zum Tool: faberm@rki.de"
-
+    for col, width in zip("ABCDEFG", [5, 5, 6, 6, 5, 6, 5]):
         ws.column_dimensions[col].width = width
-
+        
     for i, row in df.iterrows():
         r = i + 2
         ws.cell(row=r, column=1).value = row["Datum"]
