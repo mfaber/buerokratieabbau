@@ -104,6 +104,21 @@ def create_formatted_excel(df):
     ws["L9"] = "5. Minuten in Spalte N manuell ergänzen."
     ws["L10"] = "6. (optional) Verwaltung um geeignete Workflows bitten."
     ws["L11"] = "7. Fragen, Anregungen zum Tool: faberm@rki.de"
+
+    ws["A1"] = "Wo."
+    ws["B1"] = "tag"
+    ws["C1"] = "Tag"
+    ws.merge_cells("A1:B1")
+    ws.merge_cells("C1:C2")
+    ws["D1"] = "Beginn"
+    ws["F1"] = "Ende"
+    ws.merge_cells("D1:E1")
+    ws.merge_cells("F1:G1")
+    ws["D2"] = "Std"
+    ws["E2"] = "Min"
+    ws["F2"] = "Std"
+    ws["G2"] = "Min"
+
     for col, width in zip("ABCDEFG", [5, 5, 6, 6, 5, 6, 5]):
         ws.column_dimensions[col].width = width
 
