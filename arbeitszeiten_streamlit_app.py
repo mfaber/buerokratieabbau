@@ -91,7 +91,8 @@ def extract_times_from_pdf(pdf_bytes):
 def create_formatted_excel(df):
     wb = Workbook()
     ws = wb.active
-    ws["L1"] = "ℹ️ Anleitung zur Nutzung:"ws["L2"] = "1. Zeiten aus MyTMA exportieren:"
+    ws["L1"] = "ℹ️ Anleitung zur Nutzung:"
+    ws["L2"] = "1. Zeiten aus MyTMA exportieren:"
     ws["L3"] = "   - Auskunft → Selbstauskunft"
     ws["L4"] = "   - Monat und Jahr wählen, Haken bei 'Bemerkungen' und 'Kalenderwochen' deaktivieren"
     ws["L5"] = "   - Auf 'Drucken' klicken und PDF abspeichern"
