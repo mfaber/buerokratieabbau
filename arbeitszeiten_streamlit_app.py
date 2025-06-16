@@ -157,7 +157,8 @@ if uploaded_file:
     with st.spinner("Verarbeite PDF..."):
         df_result = extract_times_from_pdf(pdf_bytes)
         st.success("Extraktion abgeschlossen!")
-        st.dataframe(df_result)
+                df_view = df_result.drop(df_result.columns[6:14], axis=1)
+        st.dataframe(df_view)
 
         excel_bytes = create_formatted_excel(df_result)
         st.download_button("📥 Excel herunterladen", excel_bytes,
