@@ -111,10 +111,10 @@ def create_formatted_excel(df):
         ws.cell(row=r, column=1).value = row["Datum"]
         ws.cell(row=r, column=2).value = row["Datum"]
         ws.cell(row=r, column=3).value = row["Wochentag"]
-        ws.cell(row=r, column=4).value = row["Von_gesamt_Stunde"]
-        ws.cell(row=r, column=5).value = row["Von_gesamt_Minute"]
-        ws.cell(row=r, column=6).value = row["Bis_gesamt_Stunde"]
-        ws.cell(row=r, column=7).value = row["Bis_gesamt_Minute"]
+        ws.cell(row=r, column=4).value = int(row["Von_gesamt_Stunde"]) if pd.notna(row["Von_gesamt_Stunde"]) else None
+        ws.cell(row=r, column=5).value = int(row["Von_gesamt_Minute"]) if pd.notna(row["Von_gesamt_Minute"]) else None
+        ws.cell(row=r, column=6).value = int(row["Bis_gesamt_Stunde"]) if pd.notna(row["Bis_gesamt_Stunde"]) else None
+        ws.cell(row=r, column=7).value = int(row["Bis_gesamt_Minute"]) if pd.notna(row["Bis_gesamt_Minute"]) else None
 
     for row in ws.iter_rows(min_row=3, max_row=ws.max_row, min_col=1, max_col=7):
         wtag = row[2].value
