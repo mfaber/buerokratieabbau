@@ -115,7 +115,7 @@ def create_formatted_excel(df):
         ws.column_dimensions[col].width = width
 
     for i, row in df.iterrows():
-        r = i + 3
+        r = i + 2
         ws.cell(row=r, column=1).value = row["Datum"]
         ws.cell(row=r, column=2).value = row["Datum"]
         ws.cell(row=r, column=3).value = row["Wochentag"]
@@ -152,6 +152,8 @@ def create_formatted_excel(df):
 6. (optional) Bitte die Verwaltung, geeignete Workflows zu nutzen oder solche Arbeiten selbst zu übernehmen.
 7. Fragen, Anregungen zum Tool: faberm@rki.de"""
     ws["J1"].alignment = Alignment(wrap_text=True, vertical="top")
+    ws.row_dimensions[1].height = 15  # Fixe Höhe
+    ws.row_dimensions[2].height = 15
     ws.column_dimensions["J"].width = 70
     wb.save(buffer)
     return buffer.getvalue()
