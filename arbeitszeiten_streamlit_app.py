@@ -4,6 +4,9 @@ import pandas as pd
 import pdfplumber
 import re
 from io import BytesIO
+from openpyxl import load_workbook
+from openpyxl.styles import PatternFill, Border, Side
+from openpyxl.utils import get_column_letter
 
 st.set_page_config(page_title="Arbeitszeiten-Extraktion", layout="wide")
 st.title("🕒 Arbeitszeit-Extraktion aus MyTMA-PDF")
@@ -18,13 +21,11 @@ st.markdown("""
 
 2. **PDF-Datei hochladen**, die aus dem MyTMA-System exportiert wurde.
 
-3. Das Tool liest die Tabelle automatisch aus und extrahiert die Zeitangaben** (Von1, Bis1, Von2, Bis2).
+3. Das Tool liest die Tabelle automatisch aus und extrahiert bis zu **vier Zeitangaben** (Von1, Bis1, Von2, Bis2).
 
-4. Es berechnet **Von_gesamt** (erste Zeit) und **Bis_gesamt** (letzte Zeit). Achtung, die Pausen werden nicht rausgerechnet.
+4. Es berechnet **Von_gesamt** (erste Zeit) und **Bis_gesamt** (letzte Zeit mit Fallback).
 
-5. Du kannst die berechneten **Stunden und Minuten als Excel-Datei herunterladen**.
-
-💡 6. Markiere die 4 Spalten mit den von und bis Stunden/Minuten und kopiere diese (mit Werte einfügen) in die Zeiterfassungstabelle. Die für das Projekt gearbeiteten Minuten kannst Du dann von Hand in der Spalte N ergänzen.
+5. Du kannst die berechneten **Stunden und Minuten als Excel-Datei herunterladen** – komplett formatiert wie deine Vorlage.
 """)
 
 uploaded_file = st.file_uploader("PDF-Datei hochladen", type="pdf")
@@ -52,9 +53,7 @@ def extract_times_from_pdf(pdf_bytes):
                 extrahiert.append([datum, wochentag, von1, bis1, von2, bis2])
 
     df = pd.DataFrame(extrahiert, columns=["Datum", "Wochentag", "Von1", "Bis1", "Von2", "Bis2"])
-
-    # ❗ Nur erste Zeile (vermutlich Vormonat) entfernen
-    df = df.iloc[1:]
+    df = df.iloc[1:]  # erste Zeile entfernen
 
     def parse_time(text):
         match = re.match(r"(\d{1,2})[:\.]?(\d{2})", str(text))
@@ -80,14 +79,66 @@ def extract_times_from_pdf(pdf_bytes):
         df.loc[mask, [col, stc, mic]] = pd.NA
 
     df = df.astype({col: "Int64" for col in df.columns if col.endswith("_Stunde") or col.endswith("_Minute")})
+    return df
 
-    export_df = df[[
-        "Datum", "Wochentag",
-        "Von_gesamt_Stunde", "Von_gesamt_Minute",
-        "Bis_gesamt_Stunde", "Bis_gesamt_Minute"
-    ]]
+def export_formatiert_excel(df):
+    from openpyxl import Workbook
 
-    return export_df
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Arbeitszeiten"
+
+    # Farben/Rahmen
+    yellow_fill = PatternFill("solid", fgColor="FFFF99")
+    blue_border_thin = Side(style="thin", color="0000FF")
+    blue_border_thick = Side(style="medium", color="0000FF")
+
+    # Kopfzeile
+    ws["A1"] = "Wo."
+    ws["B1"] = "tag"
+    ws["C1"] = "Tag"
+    ws.merge_cells("A1:B1")
+    ws.merge_cells("C1:C2")
+    ws["D1"] = "Beginn"
+    ws["F1"] = "Ende"
+    ws.merge_cells("D1:E1")
+    ws.merge_cells("F1:G1")
+    ws["D2"] = "Std"
+    ws["E2"] = "Min"
+    ws["F2"] = "Std"
+    ws["G2"] = "Min"
+
+    # Spaltenbreiten
+    for col, width in zip("ABCDEFG", [5, 5, 6, 6, 5, 6, 5]):
+        ws.column_dimensions[col].width = width
+
+    for i, row in df.iterrows():
+        r = i + 3
+        ws.cell(row=r, column=1).value = row["Datum"]
+        ws.cell(row=r, column=2).value = row["Datum"]
+        ws.cell(row=r, column=3).value = row["Wochentag"]
+        ws.cell(row=r, column=4).value = row["Von_gesamt_Stunde"]
+        ws.cell(row=r, column=5).value = row["Von_gesamt_Minute"]
+        ws.cell(row=r, column=6).value = row["Bis_gesamt_Stunde"]
+        ws.cell(row=r, column=7).value = row["Bis_gesamt_Minute"]
+
+    for row in ws.iter_rows(min_row=3, max_row=ws.max_row, min_col=1, max_col=7):
+        wtag = row[2].value
+        is_weekend = str(wtag).strip() in {"Sa", "So"}
+
+        for cell in row:
+            cell.border = Border(top=blue_border_thin, bottom=blue_border_thin,
+                                 left=blue_border_thin, right=blue_border_thin)
+            if is_weekend:
+                cell.fill = yellow_fill
+
+        for i in [3, 4, 5, 6]:  # CDEF → Beginn/Ende
+            row[i].border = Border(top=blue_border_thick, bottom=blue_border_thick,
+                                   left=blue_border_thick, right=blue_border_thick)
+
+    buffer = BytesIO()
+    wb.save(buffer)
+    return buffer.getvalue()
 
 if uploaded_file:
     pdf_bytes = uploaded_file.read()
@@ -96,8 +147,7 @@ if uploaded_file:
         st.success("Extraktion abgeschlossen!")
         st.dataframe(df_result)
 
-        buffer = BytesIO()
-        df_result.to_excel(buffer, index=False, engine="openpyxl")
-        st.download_button("📥 Excel herunterladen", buffer.getvalue(),
-                           file_name="Arbeitszeiten_Export.xlsx",
+        excel_bytes = export_formatiert_excel(df_result)
+        st.download_button("📥 Excel herunterladen", excel_bytes,
+                           file_name="Arbeitszeiten_Export_formatiert.xlsx",
                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
