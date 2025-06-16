@@ -11,20 +11,27 @@ st.set_page_config(page_title="Arbeitszeiten-Extraktion", layout="wide")
 st.title("🕒 Arbeitszeit-Extraktion aus MyTMA-PDF")
 
 st.markdown("""
-### ℹ️ Anleitung zur Nutzung
+## ℹ️ Anleitung zur Nutzung
 
-1. **Zeiten aus MyTMA exportieren:**  
-   - Menüpunkt *Auskunft → Selbstauskunft*  
-   - Dann **Monat und Jahr wählen** und unten die beiden Haken bei **„Bemerkungen“** und **„Kalenderwochen“** deaktivieren  
-   - Auf **„Drucken“ klicken** und das PDF irgendwo abspeichern  
+1. **Zeiten aus MyTMA exportieren:**
+   - Menüpunkt *Auskunft → Selbstauskunft*
+   - Dann **Monat und Jahr wählen** und unten die beiden Haken bei **„Bemerkungen“** und **„Kalenderwochen“** deaktivieren
+   - Auf **„Drucken“ klicken** und das PDF irgendwo abspeichern
 
 2. **PDF-Datei hochladen**, die aus dem MyTMA-System exportiert wurde.
 
-3. Das Tool liest die Tabelle automatisch aus und extrahiert bis zu **vier Zeitangaben** (Von1, Bis1, Von2, Bis2).
+4. Es berechnet **Von_gesamt** (erste Zeit) und **Bis_gesamt** (letzte Zeit). Achtung, die Pausen werden nicht rausgerechnet.
 
-4. Es berechnet **Von_gesamt** (erste Zeit) und **Bis_gesamt** (letzte Zeit mit Fallback).
+5. Du kannst die berechneten **Stunden und Minuten als Excel-Datei herunterladen**.
 
-5. Du kannst die berechneten **Stunden und Minuten als Excel-Datei herunterladen** – komplett formatiert wie deine Vorlage.
+💡 6. Markiere die 4 Spalten mit den von und bis Stunden/Minuten und kopiere diese (mit Werte einfügen) in die Zeiterfassungstabelle.
+    Die für das Projekt gearbeiteten Minuten kannst Du dann von Hand in der Spalte N ergänzen.
+
+7. (optional) Bitte die Verwaltung, in Zukunft auf solche Prozesse zu verzichten, geeignete Workflows
+   (copy-paste statt Zahlen vom einen Verwaltungssystem in ein anderes zu übertragen) zur Verfügung zu stellen
+   oder solche Arbeiten selbst auszuführen ;).
+
+Fragen, Anregungen zum Tool: faberm@rki.de
 """)
 
 uploaded_file = st.file_uploader("PDF-Datei hochladen", type="pdf")
@@ -131,7 +138,31 @@ def create_formatted_excel(df):
             row[i].border = Border(top=blue_border_thick, bottom=blue_border_thick,
                                    left=blue_border_thick, right=blue_border_thick)
 
-    buffer = BytesIO()
+        buffer = BytesIO()
+    ws["J1"] = """ℹ️ Anleitung zur Nutzung:
+ℹ️ Anleitung zur Nutzung
+
+1. **Zeiten aus MyTMA exportieren:**
+   - Menüpunkt *Auskunft → Selbstauskunft*
+   - Dann **Monat und Jahr wählen** und unten die beiden Haken bei **„Bemerkungen“** und **„Kalenderwochen“** deaktivieren
+   - Auf **„Drucken“ klicken** und das PDF irgendwo abspeichern
+
+2. **PDF-Datei hochladen**, die aus dem MyTMA-System exportiert wurde.
+
+4. Es berechnet **Von_gesamt** (erste Zeit) und **Bis_gesamt** (letzte Zeit). Achtung, die Pausen werden nicht rausgerechnet.
+
+5. Du kannst die berechneten **Stunden und Minuten als Excel-Datei herunterladen**.
+
+💡 6. Markiere die 4 Spalten mit den von und bis Stunden/Minuten und kopiere diese (mit Werte einfügen) in die Zeiterfassungstabelle.
+    Die für das Projekt gearbeiteten Minuten kannst Du dann von Hand in der Spalte N ergänzen.
+
+7. (optional) Bitte die Verwaltung, in Zukunft auf solche Prozesse zu verzichten, geeignete Workflows
+   (copy-paste statt Zahlen vom einen Verwaltungssystem in ein anderes zu übertragen) zur Verfügung zu stellen
+   oder solche Arbeiten selbst auszuführen ;).
+
+Fragen, Anregungen zum Tool: faberm@rki.de"""
+    ws["J1"].alignment = Alignment(wrap_text=True, vertical="top")
+    ws.column_dimensions["J"].width = 70
     wb.save(buffer)
     return buffer.getvalue()
 
