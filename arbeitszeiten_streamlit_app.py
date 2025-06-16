@@ -111,10 +111,7 @@ def create_formatted_excel(df):
     ws["L13"] = "   oder solche Arbeiten selbst auszuführen ;)."
     ws["L14"] = "Fragen, Anregungen zum Tool: faberm@rki.de"
 
-    ws["A1"] = "Wo."
-    ws["B1"] = "Tag"
-    ws.merge_cells("A1:B1")
-    ws.merge_cells("C1:C2")
+    ws["A1"] = "Datum"
     ws["D1"] = "Beginn"
     ws["F1"] = "Ende"
     ws.merge_cells("D1:E1")
