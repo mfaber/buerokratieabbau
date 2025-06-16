@@ -91,27 +91,18 @@ def extract_times_from_pdf(pdf_bytes):
 def create_formatted_excel(df):
     wb = Workbook()
     ws = wb.active
-    ws.title = "Arbeitszeiten"
+    ws["L1"] = "ℹ️ Anleitung zur Nutzung:"
+    ws["L2"] = "1. Zeiten aus MyTMA exportieren:"
+    ws["L3"] = "   - Auskunft → Selbstauskunft"
+    ws["L4"] = "   - Monat und Jahr wählen, Haken bei 'Bemerkungen' und 'Kalenderwochen' deaktivieren"
+    ws["L5"] = "   - Auf 'Drucken' klicken und PDF abspeichern"
+    ws["L6"] = "2. PDF-Datei hochladen, die aus dem MyTMA-System exportiert wurde."
+    ws["L7"] = "3. Von_gesamt = erste Zeit, Bis_gesamt = letzte Zeit. Pausen werden nicht abgezogen."
+    ws["L8"] = "4. Excel herunterladen, Zeitspalten kopieren, in Zeiterfassungstabelle einfügen."
+    ws["L9"] = "5. Minuten in Spalte N manuell ergänzen."
+    ws["L10"] = "6. (optional) Verwaltung um geeignete Workflows bitten."
+    ws["L11"] = "7. Fragen, Anregungen zum Tool: faberm@rki.de"
 
-    yellow_fill = PatternFill("solid", fgColor="FFFF99")
-    blue_border_thin = Side(style="thin", color="0000FF")
-    blue_border_thick = Side(style="medium", color="0000FF")
-
-    ws["A1"] = "Wo."
-    ws["B1"] = "tag"
-    ws["C1"] = "Tag"
-    ws.merge_cells("A1:B1")
-    ws.merge_cells("C1:C2")
-    ws["D1"] = "Beginn"
-    ws["F1"] = "Ende"
-    ws.merge_cells("D1:E1")
-    ws.merge_cells("F1:G1")
-    ws["D2"] = "Std"
-    ws["E2"] = "Min"
-    ws["F2"] = "Std"
-    ws["G2"] = "Min"
-
-    for col, width in zip("ABCDEFG", [5, 5, 6, 6, 5, 6, 5]):
         ws.column_dimensions[col].width = width
 
     for i, row in df.iterrows():
@@ -139,22 +130,7 @@ def create_formatted_excel(df):
                                    left=blue_border_thick, right=blue_border_thick)
 
         buffer = BytesIO()
-    ws["J1"] = """ℹ️ Anleitung zur Nutzung:
-1. Zeiten aus MyTMA exportieren:
-   - Menüpunkt 'Auskunft → Selbstauskunft'
-   - Monat und Jahr wählen, Haken bei 'Bemerkungen' und 'Kalenderwochen' deaktivieren
-   - Auf 'Drucken' klicken und das PDF abspeichern
-2. PDF-Datei hochladen, die aus dem MyTMA-System exportiert wurde.
-3. Es berechnet Von_gesamt (erste Zeit) und Bis_gesamt (letzte Zeit). Pausen werden nicht abgezogen.
-4. Du kannst die berechneten Stunden und Minuten als Excel-Datei herunterladen.
-5. Markiere die 4 Spalten mit den Von/Bis-Stunden/Minuten und kopiere sie in die Zeiterfassungstabelle (Werte einfügen).
-   Die für das Projekt gearbeiteten Minuten kannst du manuell in Spalte N ergänzen.
-6. (optional) Bitte die Verwaltung, geeignete Workflows zu nutzen oder solche Arbeiten selbst zu übernehmen.
-7. Fragen, Anregungen zum Tool: faberm@rki.de"""
-    ws["J1"].alignment = Alignment(wrap_text=True, vertical="top")
-    ws.row_dimensions[1].height = 15  # Fixe Höhe
-    ws.row_dimensions[2].height = 15
-    ws.column_dimensions["J"].width = 70
+    
     wb.save(buffer)
     return buffer.getvalue()
 
