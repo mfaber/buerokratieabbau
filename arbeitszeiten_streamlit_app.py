@@ -97,7 +97,7 @@ def create_formatted_excel(df):
     for i in range(9, 15):
         ws[f"L{i}"].font = Font(bold=True)
 
-    "1. Zeiten aus MyTMA exportieren:"
+    ws["L2"] ="1. Zeiten aus MyTMA exportieren:"
     ws["L3"] = "   - Menüpunkt Auskunft → Selbstauskunft"
     ws["L4"] = "   - Monat und Jahr wählen, Haken bei 'Bemerkungen' und 'Kalenderwochen' deaktivieren"
     ws["L5"] = "   - Auf 'Drucken' klicken und das PDF abspeichern"
