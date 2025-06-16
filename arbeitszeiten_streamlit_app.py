@@ -1,11 +1,10 @@
-
 import streamlit as st
 import pandas as pd
 import pdfplumber
 import re
 from io import BytesIO
 from openpyxl import Workbook
-from openpyxl.styles import PatternFill, Border, Side, Alignment
+from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 
 st.set_page_config(page_title="Arbeitszeiten-Extraktion", layout="wide")
 st.title("🕒 Arbeitszeit-Extraktion aus MyTMA-PDF")
@@ -19,19 +18,19 @@ st.markdown("""## ℹ️ Anleitung zur Nutzung
 
 2. **PDF-Datei hochladen**, die aus dem MyTMA-System exportiert wurde.
 
-3. Es berechnet **Von_gesamt** (erste Zeit) und **Bis_gesamt** (letzte Zeit). Achtung, die Pausen werden nicht rausgerechnet.
+3. Es werden die Zeiten **Von_gesamt** (erstes Einloggen am Tag) und **Bis_gesamt** (letztes Ausloggen am Tag) extrahiert. Achtung, die Pausen werden nicht rausgerechnet. Stunden und Minuten werden aufgetrennt, sodass diese dem Gleitzeitbogen entsprechen.
 
 4. Du kannst die berechneten **Stunden und Minuten als Excel-Datei herunterladen**.
 
-5. Markiere alle Felder mit den Beginn- und Ende- Stunden/Minuten und kopiere diese (mit Werte einfügen) in die Zeiterfassungstabelle.
+5. Markiere alle Felder mit den Beginn- und Ende- Stunden/Minuten und kopiere diese (mit *Werte einfügen*) in die Zeiterfassungstabelle.
 
 💡 **Tipp:** Die für das Projekt gearbeiteten Minuten kannst Du dann von Hand in der Spalte N ergänzen.
 
 6. *(optional)* Bitte die Verwaltung, in Zukunft auf solche Prozesse zu verzichten, geeignete Workflows  
-   (copy-paste statt Zahlen vom einen Verwaltungssystem in ein anderes zu übertragen) zur Verfügung zu stellen  
-   oder solche Arbeiten selbst auszuführen ;).
+   (copy-paste statt Zahlen vom einen Verwaltungssystem in ein anderes zu übertragen) zur Verfügung zu stellen oder solche Arbeiten selbst auszuführen ;).
 
-Fragen, Anregungen zum Tool: faberm@rki.de""")
+Fragen, Anregungen zum Tool: [faberm@rki.de](mailto:faberm@rki.de)
+""")
 
 uploaded_file = st.file_uploader("PDF-Datei hochladen", type="pdf")
 
@@ -93,23 +92,23 @@ def create_formatted_excel(df):
     wb = Workbook()
     ws = wb.active
 
-    from openpyxl.styles import Font
-    for i in range(9, 15):
-        ws[f"L{i}"].font = Font(bold=True)
-
-    ws["L2"] ="1. Zeiten aus MyTMA exportieren:"
-    ws["L3"] = "   - Menüpunkt Auskunft → Selbstauskunft"
-    ws["L4"] = "   - Monat und Jahr wählen, Haken bei 'Bemerkungen' und 'Kalenderwochen' deaktivieren"
-    ws["L5"] = "   - Auf 'Drucken' klicken und das PDF abspeichern"
-    ws["L6"] = "2. PDF-Datei hochladen, die aus dem MyTMA-System exportiert wurde."
-    ws["L7"] = "3. Es berechnet Von_gesamt (erste Zeit) und Bis_gesamt (letzte Zeit). Achtung, die Pausen werden nicht rausgerechnet."
-    ws["L8"] = "4. Du kannst die berechneten Stunden und Minuten als Excel-Datei herunterladen."
-    ws["L9"] = "5. Markiere alle Felder mit den Beginn- und Ende- Stunden/Minuten und kopiere diese (mit Werte einfügen) in die Zeiterfassungstabelle."
-    ws["L10"] = "6. Die für das Projekt gearbeiteten Minuten kannst Du dann von Hand in der Spalte N ergänzen."
-    ws["L11"] = "7. (optional) Bitte die Verwaltung, in Zukunft auf solche Prozesse zu verzichten, geeignete Workflows"
-    ws["L12"] = "   (copy-paste statt Zahlen vom einen Verwaltungssystem in ein anderes zu übertragen) bereitzustellen"
-    ws["L13"] = "   oder solche Arbeiten selbst auszuführen ;)."
-    ws["L14"] = "Fragen, Anregungen zum Tool: faberm@rki.de"
+    canvas_text = [
+        "1. Zeiten aus MyTMA exportieren:",
+        "- Menüpunkt Auskunft → Selbstauskunft",
+        "- Dann Monat und Jahr wählen und unten die beiden Haken bei „Bemerkungen“ und „Kalenderwochen“ deaktivieren",
+        "- Auf „Drucken“ klicken und das PDF irgendwo abspeichern",
+        "2. PDF-Datei hochladen, die aus dem MyTMA-System exportiert wurde.",
+        "3. Es werden die Zeiten Von_gesamt (erstes Einloggen am Tag) und Bis_gesamt (letztes Ausloggen am Tag) extrahiert. Achtung, die Pausen werden nicht rausgerechnet. Stunden und Minuten werden aufgetrennt, sodass diese dem Gleitzeitbogen entsprechen.",
+        "4. Du kannst die berechneten Stunden und Minuten als Excel-Datei herunterladen.",
+        "5. Markiere alle Felder mit den Beginn- und Ende- Stunden/Minuten und kopiere diese (mit Werte einfügen) in die Zeiterfassungstabelle.",
+        "💡 Tipp: Die für das Projekt gearbeiteten Minuten kannst Du dann von Hand in der Spalte N ergänzen.",
+        "6. (optional) Bitte die Verwaltung, in Zukunft auf solche Prozesse zu verzichten, geeignete Workflows",
+        "(copy-paste statt Zahlen vom einen Verwaltungssystem in ein anderes zu übertragen) zur Verfügung zu stellen oder solche Arbeiten selbst auszuführen ;).",
+        "Fragen, Anregungen zum Tool: faberm@rki.de"
+    ]
+    for i, line in enumerate(canvas_text):
+        ws[f"L{i+2}"] = line
+        ws[f"L{i+2}"].font = Font(bold=True)
 
     ws["A1"] = "Datum"
     ws["D1"] = "Beginn"
@@ -148,7 +147,6 @@ def create_formatted_excel(df):
                                    left=blue_border_thick, right=blue_border_thick)
 
     buffer = BytesIO()
-    
     wb.save(buffer)
     return buffer.getvalue()
 
@@ -162,5 +160,5 @@ if uploaded_file:
 
     excel_bytes = create_formatted_excel(df_result)
     st.download_button("📥 Excel herunterladen", excel_bytes,
-                           file_name="Arbeitszeiten_Export_formatiert.xlsx",
-                           mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                       file_name="Arbeitszeiten_Export_formatiert.xlsx",
+                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
