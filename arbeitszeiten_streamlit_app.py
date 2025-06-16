@@ -92,6 +92,10 @@ def create_formatted_excel(df):
     wb = Workbook()
     ws = wb.active
     ws["L1"] = "ℹ️ Anleitung zur Nutzung:"
+
+    for col, width in zip("ABCDEFG", [5, 5, 6, 6, 5, 6, 5]):
+        ws.column_dimensions[col].width = width
+
     ws["L2"] = "1. Zeiten aus MyTMA exportieren:"
     ws["L3"] = "   - Auskunft → Selbstauskunft"
     ws["L4"] = "   - Monat und Jahr wählen, Haken bei 'Bemerkungen' und 'Kalenderwochen' deaktivieren"
