@@ -97,6 +97,23 @@ def create_formatted_excel(df):
     ws["L1"] = "ℹ️ Anleitung zur Nutzung:"
     ws["L2"] = "1. Zeiten aus MyTMA exportieren:"
     ws["L3"] = "   - Menüpunkt Auskunft → Selbstauskunft"
+    ws["L4"] = "   - Dann Monat und Jahr wählen und unten die beiden Haken bei 'Bemerkungen' und 'Kalenderwochen' deaktivieren"
+    ws["L5"] = "   - Auf 'Drucken' klicken und das PDF irgendwo abspeichern"
+    ws["L6"] = "2. PDF-Datei hochladen, die aus dem MyTMA-System exportiert wurde."
+    ws["L7"] = "3. Es berechnet Von_gesamt (erste Zeit) und Bis_gesamt (letzte Zeit). Achtung, die Pausen werden nicht rausgerechnet."
+    ws["L8"] = "4. Du kannst die berechneten Stunden und Minuten als Excel-Datei herunterladen."
+    ws["L9"] = "5. Markiere die 4 Spalten mit den von und bis Stunden/Minuten und kopiere diese (mit Werte einfügen) in die Zeiterfassungstabelle."
+    ws["L10"] = "6. Die für das Projekt gearbeiteten Minuten kannst Du dann von Hand in der Spalte N ergänzen."
+    ws["L11"] = "7. (optional) Bitte die Verwaltung, in Zukunft auf solche Prozesse zu verzichten, geeignete Workflows"
+    ws["L12"] = "   (copy-paste statt Zahlen vom einen Verwaltungssystem in ein anderes zu übertragen) zur Verfügung zu stellen"
+    ws["L13"] = "   oder solche Arbeiten selbst auszuführen ;)."
+    ws["L14"] = "Fragen, Anregungen zum Tool: faberm@rki.de"
+    from openpyxl.styles import Font
+    for i in range(10, 15):
+        ws[f"L{i}"].font = Font(bold=True)
+
+    "1. Zeiten aus MyTMA exportieren:"
+    ws["L3"] = "   - Menüpunkt Auskunft → Selbstauskunft"
     ws["L4"] = "   - Monat und Jahr wählen, Haken bei 'Bemerkungen' und 'Kalenderwochen' deaktivieren"
     ws["L5"] = "   - Auf 'Drucken' klicken und das PDF abspeichern"
     ws["L6"] = "2. PDF-Datei hochladen, die aus dem MyTMA-System exportiert wurde."
@@ -126,9 +143,6 @@ def create_formatted_excel(df):
     for col, width in zip("ABCDEFG", [5, 5, 6, 6, 5, 6, 5]):
         ws.column_dimensions[col].width = width
 
-
-        ws.column_dimensions[col].width = width
-
     for i, row in df.iterrows():
         r = i + 2
         ws.cell(row=r, column=1).value = row["Datum"]
@@ -153,7 +167,7 @@ def create_formatted_excel(df):
             row[i].border = Border(top=blue_border_thick, bottom=blue_border_thick,
                                    left=blue_border_thick, right=blue_border_thick)
 
-        buffer = BytesIO()
+    buffer = BytesIO()
     
     wb.save(buffer)
     return buffer.getvalue()
