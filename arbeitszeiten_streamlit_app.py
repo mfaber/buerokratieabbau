@@ -160,7 +160,7 @@ if uploaded_file:
     df_view = df_result.drop(columns=['Von1_Stunde', 'Von1_Minute', 'Bis1_Stunde', 'Bis1_Minute', 'Von2_Stunde', 'Von2_Minute', 'Bis2_Stunde', 'Bis2_Minute'], errors="ignore")
     st.dataframe(df_view)
 
-        excel_bytes = create_formatted_excel(df_result)
-        st.download_button("📥 Excel herunterladen", excel_bytes,
+    excel_bytes = create_formatted_excel(df_result)
+    st.download_button("📥 Excel herunterladen", excel_bytes,
                            file_name="Arbeitszeiten_Export_formatiert.xlsx",
                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
