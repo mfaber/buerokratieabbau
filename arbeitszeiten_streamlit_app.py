@@ -5,7 +5,7 @@ import pdfplumber
 import re
 from io import BytesIO
 from openpyxl import Workbook
-from openpyxl.styles import PatternFill, Border, Side
+from openpyxl.styles import PatternFill, Border, Side, Alignment
 
 st.set_page_config(page_title="Arbeitszeiten-Extraktion", layout="wide")
 st.title("🕒 Arbeitszeit-Extraktion aus MyTMA-PDF")
