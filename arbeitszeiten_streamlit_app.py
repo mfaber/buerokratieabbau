@@ -10,8 +10,7 @@ from openpyxl.styles import PatternFill, Border, Side, Alignment
 st.set_page_config(page_title="Arbeitszeiten-Extraktion", layout="wide")
 st.title("🕒 Arbeitszeit-Extraktion aus MyTMA-PDF")
 
-st.markdown("""
-## ℹ️ Anleitung zur Nutzung
+st.markdown("""## ℹ️ Anleitung zur Nutzung
 
 1. **Zeiten aus MyTMA exportieren:**
    - Menüpunkt *Auskunft → Selbstauskunft*
@@ -20,20 +19,19 @@ st.markdown("""
 
 2. **PDF-Datei hochladen**, die aus dem MyTMA-System exportiert wurde.
 
-4. Es berechnet **Von_gesamt** (erste Zeit) und **Bis_gesamt** (letzte Zeit). Achtung, die Pausen werden nicht rausgerechnet.
+3. Es berechnet **Von_gesamt** (erste Zeit) und **Bis_gesamt** (letzte Zeit). Achtung, die Pausen werden nicht rausgerechnet.
 
-5. Du kannst die berechneten **Stunden und Minuten als Excel-Datei herunterladen**.
+4. Du kannst die berechneten **Stunden und Minuten als Excel-Datei herunterladen**.
 
-💡 6. Markiere die 4 Spalten mit den von und bis Stunden/Minuten und kopiere diese (mit Werte einfügen) in die Zeiterfassungstabelle.
-    
-7. Die für das Projekt gearbeiteten Minuten kannst Du dann von Hand in der Spalte N ergänzen.
+5. Markiere die 4 Spalten mit den von und bis Stunden/Minuten und kopiere diese (mit *Werte einfügen*) in die Zeiterfassungstabelle.
 
-8. (optional) Bitte die Verwaltung, in Zukunft auf solche Prozesse zu verzichten, geeignete Workflows
-   (copy-paste statt Zahlen vom einen Verwaltungssystem in ein anderes zu übertragen) zur Verfügung zu stellen
+💡 **Tipp:** Die für das Projekt gearbeiteten Minuten kannst Du dann von Hand in der Spalte N ergänzen.
+
+6. *(optional)* Bitte die Verwaltung, in Zukunft auf solche Prozesse zu verzichten, geeignete Workflows  
+   (copy-paste statt Zahlen vom einen Verwaltungssystem in ein anderes zu übertragen) zur Verfügung zu stellen  
    oder solche Arbeiten selbst auszuführen ;).
 
-Fragen, Anregungen zum Tool: faberm@rki.de
-""")
+Fragen, Anregungen zum Tool: faberm@rki.de""")
 
 uploaded_file = st.file_uploader("PDF-Datei hochladen", type="pdf")
 
