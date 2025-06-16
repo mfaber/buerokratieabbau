@@ -94,7 +94,7 @@ def create_formatted_excel(df):
     ws = wb.active
 
     from openpyxl.styles import Font
-    for i in range(10, 15):
+    for i in range(9, 15):
         ws[f"L{i}"].font = Font(bold=True)
 
     "1. Zeiten aus MyTMA exportieren:"
@@ -112,7 +112,6 @@ def create_formatted_excel(df):
     ws["L14"] = "Fragen, Anregungen zum Tool: faberm@rki.de"
 
     ws["A1"] = "Wo."
-    ws["B1"] = "tag"
     ws["C1"] = "Tag"
     ws.merge_cells("A1:B1")
     ws.merge_cells("C1:C2")
