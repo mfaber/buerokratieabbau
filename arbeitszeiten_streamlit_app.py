@@ -94,7 +94,21 @@ def create_formatted_excel(df):
     wb = Workbook()
     ws = wb.active
     ws["L1"] = "ℹ️ Anleitung zur Nutzung"
+    ws["L2"] = "1. Zeiten aus MyTMA exportieren:"
+    ws["L3"] = "- Menüpunkt Auskunft → Selbstauskunft"
+    ws["L4"] = "- Dann Monat und Jahr wählen und unten die beiden Haken bei „Bemerkungen“ und „Kalenderwochen“ deaktivieren"
+    ws["L5"] = "- Auf „Drucken“ klicken und das PDF irgendwo abspeichern"
+    ws["L6"] = "2. PDF-Datei hochladen, die aus dem MyTMA-System exportiert wurde."
+    ws["L7"] = "4. Es berechnet Von_gesamt (erste Zeit) und Bis_gesamt (letzte Zeit). Achtung, die Pausen werden nicht rausgerechnet."
+    ws["L8"] = "5. Du kannst die berechneten Stunden und Minuten als Excel-Datei herunterladen."
+    ws["L9"] = "6. Markiere alle Felder mit den Beginn- und Ende- Stunden/Minuten und kopiere diese (mit Werte einfügen) in die Zeiterfassungstabelle."
+    ws["L10"] = "7. Die für das Projekt gearbeiteten Minuten kannst Du dann von Hand in der Spalte N ergänzen."
+    ws["L11"] = "7. (optional) Bitte die Verwaltung, in Zukunft auf solche Prozesse zu verzichten, geeignete Workflows"
+    ws["L12"] = "(copy-paste statt Zahlen vom einen Verwaltungssystem in ein anderes zu übertragen) zur Verfügung zu stellen"
+    ws["L13"] = "oder solche Arbeiten selbst auszuführen ;)."
+    ws["L14"] = "Fragen, Anregungen zum Tool: faberm@rki.de"
 
+    
     
     from openpyxl.styles import Font
     for i in range(9, 14 + 1):
