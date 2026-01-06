@@ -46,17 +46,69 @@ def extract_times_from_pdf(pdf_bytes):
     for page in pages:
         for i, row in page.iterrows():
             row_text = " ".join(str(cell) for cell in row if cell)
-            zeiten = re.findall(r"\d{2}:\d{2}", row_text)
-            if re.match(r"^\d{2}\.\d{2}\.", row_text):
+            # Robuste Extraktion: nur Zeiten aus Spalte 2–7
+            # Robuste Extraktion: ziehe Uhrzeiten paarweise nur aus Spalten 2–7
+            uhrzeit_paare = []
+            zellen_mit_zeiten = row[2:8]  # Spalten mit Von/Bis-Einträgen
+
+            for cell in zellen_mit_zeiten:
+                if not isinstance(cell, str):
+                    continue
+                matches = re.findall(r"(\d{2}):(\d{2})", cell)
+                for m in matches:
+                    uhrzeit_paare.append(f"{m[0]}:{m[1]}")
+
+            if re.match(r"^\d{2}\.\d{2}\.", str(row[0])):
                 datum = row[0]
                 wochentag = row[1]
-                von1 = zeiten[0] if len(zeiten) > 0 else ""
-                bis1 = zeiten[1] if len(zeiten) > 1 else ""
-                von2 = zeiten[2] if len(zeiten) > 2 else ""
-                bis2 = zeiten[3] if len(zeiten) > 3 else ""
-                extrahiert.append([datum, wochentag, von1, bis1, von2, bis2])
+                von1 = uhrzeit_paare[0] if len(uhrzeit_paare) >= 1 else ""
+                bis1 = uhrzeit_paare[1] if len(uhrzeit_paare) >= 2 else ""
+                von2 = uhrzeit_paare[2] if len(uhrzeit_paare) >= 3 else ""
+                bis2 = uhrzeit_paare[3] if len(uhrzeit_paare) >= 4 else ""
+                # Robuste Extraktion: ziehe Uhrzeiten aus Spalten 2–7
+            uhrzeit_paare = []
+            zellen_mit_zeiten = row[2:8]
 
-    df = pd.DataFrame(extrahiert, columns=["Datum", "Wochentag", "Von1", "Bis1", "Von2", "Bis2"])
+            for cell in zellen_mit_zeiten:
+                if not isinstance(cell, str):
+                    continue
+                matches = re.findall(r"(\d{2}):(\d{2})", cell)
+                for m in matches:
+                    uhrzeit_paare.append(f"{m[0]}:{m[1]}")
+
+            if re.match(r"^\d{2}\.\d{2}\.", str(row[0])):
+                datum = row[0]
+                wochentag = row[1]
+                von1 = uhrzeit_paare[0] if len(uhrzeit_paare) >= 1 else ""
+                bis1 = uhrzeit_paare[1] if len(uhrzeit_paare) >= 2 else ""
+                von2 = uhrzeit_paare[2] if len(uhrzeit_paare) >= 3 else ""
+                bis2 = uhrzeit_paare[3] if len(uhrzeit_paare) >= 4 else ""
+
+                von_gesamt = uhrzeit_paare[0] if uhrzeit_paare else ""
+                bis_gesamt = uhrzeit_paare[-1] if len(uhrzeit_paare) >= 2 else ""
+
+                # Robuste Extraktion: nur Zellen 3 bis 10 (echte Zeitblöcke), max. 4 Uhrzeiten
+            uhrzeiten = []
+            for cell in row[3:11]:
+                if isinstance(cell, str):
+                    cell = cell.replace(" m", "").strip()
+                    matches = re.findall(r"(\d{1,2}):(\d{2})", cell)
+                    for m in matches:
+                        uhrzeiten.append(f"{int(m[0]):02}:{m[1]}")
+            uhrzeiten = uhrzeiten[:4]
+
+            if re.match(r"^\d{2}\.\d{2}\.", str(row[0])):
+                datum = row[0]
+                wochentag = row[1]
+                von1 = uhrzeiten[0] if len(uhrzeiten) > 0 else ""
+                bis1 = uhrzeiten[1] if len(uhrzeiten) > 1 else ""
+                von2 = uhrzeiten[2] if len(uhrzeiten) > 2 else ""
+                bis2 = uhrzeiten[3] if len(uhrzeiten) > 3 else ""
+                von_gesamt = uhrzeiten[0] if uhrzeiten else ""
+                bis_gesamt = uhrzeiten[-1] if len(uhrzeiten) >= 2 else ""
+                extrahiert.append([datum, wochentag, von1, bis1, von2, bis2, von_gesamt, bis_gesamt])
+
+    df = pd.DataFrame(extrahiert, columns=["Datum", "Wochentag", "Von1", "Bis1", "Von2", "Bis2", "Von_gesamt", "Bis_gesamt"])
     if df.iloc[0]["Datum"].startswith(("28.", "29.", "30.", "31.")):
         df = df.iloc[1:]
 
