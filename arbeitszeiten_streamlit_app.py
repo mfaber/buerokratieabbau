@@ -7,7 +7,7 @@ from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 
 st.set_page_config(page_title="Arbeitszeiten-Extraktion", layout="wide")
-st.title("🕒 Arbeitszeit-Extraktion aus MyTMA-PDF")
+st.title("🕒 Arbeitszeit-Extraktion aus MyTMA-PDF 🕒")
 
 st.markdown("""## ℹ️ Anleitung zur Nutzung
 
