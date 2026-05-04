@@ -114,8 +114,8 @@ def extract_times_from_pdf(pdf_bytes: bytes) -> pd.DataFrame:
         vons = ent['von']
         biss = ent['bis']
 
-        von_gesamt = min(vons, key=to_min) if vons else (min(biss, key=to_min) if biss else '')
-        bis_gesamt = max(biss, key=to_min) if biss else (max(vons, key=to_min) if vons else '')
+        von_gesamt = min(vons, key=to_min) if vons else ''
+        bis_gesamt = max(biss, key=to_min) if biss else ''
 
         row = {
             'Datum': ent['Datum'],
@@ -129,7 +129,8 @@ def extract_times_from_pdf(pdf_bytes: bytes) -> pd.DataFrame:
         }
         rows.append(row)
 
-    df = pd.DataFrame(rows, columns=['Datum','Wochentag','Von1','Bis1','Von2','Bis2','Von_gesamt','Bis_gesamt'])
+    base_columns = ['Datum','Wochentag','Von1','Bis1','Von2','Bis2','Von_gesamt','Bis_gesamt']
+    df = pd.DataFrame(rows, columns=base_columns)
 
     # Zeiten in Stunden/Minuten zerlegen und validieren (nur für *_gesamt streng)
     def parse_time(text):
@@ -138,7 +139,14 @@ def extract_times_from_pdf(pdf_bytes: bytes) -> pd.DataFrame:
             return int(m.group(1)), int(m.group(2))
         return pd.NA, pd.NA
 
-    for col in ['Von1','Bis1','Von2','Bis2','Von_gesamt','Bis_gesamt']:
+    time_columns = ['Von1','Bis1','Von2','Bis2','Von_gesamt','Bis_gesamt']
+    if df.empty:
+        for col in time_columns:
+            df[f"{col}_Stunde"] = pd.Series(dtype='Int64')
+            df[f"{col}_Minute"] = pd.Series(dtype='Int64')
+        return df
+
+    for col in time_columns:
         df[f"{col}_Stunde"], df[f"{col}_Minute"] = zip(*df[col].apply(parse_time))
 
     def valid(st, mi):
@@ -211,6 +219,10 @@ if uploaded_file:
     pdf_bytes = uploaded_file.read()
     with st.spinner("Verarbeite PDF..."):
         df_result = extract_times_from_pdf(pdf_bytes)
+
+    if df_result.empty:
+        st.error("Keine Arbeitszeiten erkannt. Bitte prüfe, ob die PDF aus der MyTMA-Selbstauskunft stammt und die erwartete Tabellenstruktur enthält.")
+        st.stop()
 
     st.success("Extraktion abgeschlossen!")
 
